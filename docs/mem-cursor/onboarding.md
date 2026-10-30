@@ -44,7 +44,7 @@ as incomplete; fix the file and run it again.
 ## Which conversations have memory
 
 - Automatic recall and capture work only inside a git repository. They read and write that repository's
-  memory, and recall also searches global memory.
+  memory. Global memory is not injected automatically; `sno memory recall` and `get` search it too.
 - Outside a git repository, and under the system temporary directory, nothing is recalled and nothing is
   captured into memory. The explicit `sno memory` commands still work there. Their scope is the git root of
   the folder you run them in, or the folder itself when there is no git root.
