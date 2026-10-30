@@ -7,8 +7,11 @@ the Cursor CLI the same memory that Claude Code and Codex use through Sno.
 
 Requirements:
 
-- Cursor, detected by `sno setup`: the `cursor-agent` command on your PATH, or the Cursor app on macOS. If you
-  use only the IDE on Linux, install the Cursor CLI too, or setup skips Cursor
+- Cursor: the Cursor app's agent chat on macOS, or the `cursor-agent` command line on Linux and macOS.
+  Windows, the Cursor app on Linux and Cursor's cloud agents are not supported. `sno setup` finds Cursor by
+  itself and installs the command line if only the app is there.
+- One `cursor-agent login`. Automatic capture runs through the command line with its login; without it,
+  turns are never stored.
 - Node.js 22.22.3 or newer on the 22 line, 24.15.0 or newer on the 24 line, or 25.9.0 or newer
 - `git` on your PATH (memory is scoped to the repository you work in)
 
@@ -42,8 +45,9 @@ as incomplete; fix the file and run it again.
 
 - Automatic recall and capture work only inside a git repository. They read and write that repository's
   memory, and recall also searches global memory.
-- Outside a git repository, and under the system temporary directory, the hooks read and write nothing.
-  The explicit `sno memory` commands still work there, with the git root as the scope if there is one, otherwise the folder you run them in.
+- Outside a git repository, and under the system temporary directory, nothing is recalled and nothing is
+  captured into memory. The explicit `sno memory` commands still work there. Their scope is the git root of
+  the folder you run them in, or the folder itself when there is no git root.
 - With several folders open, the hooks use the repository of the first folder. To reach another
   repository's memory, run the memory commands from inside that repository's folder.
 
@@ -66,7 +70,7 @@ IDE permission rule: present
 
 The memory service starts on demand: the first hook that needs it starts it. If `sidecar` shows
 `unavailable` before you have opened any conversation, open one in a git repository and run the command
-again. `absent` next to a hook means the install did not write that entry; run `sno setup --harness
+again; `unhealthy` means the service answered but reported a problem. `absent` next to a hook means the install did not write that entry; run `sno setup --harness
 cursor` again. `unparsable` means that Cursor file could not be read as the JSON the installer expects.
 
 ## Step 2: create the first useful memory
@@ -86,7 +90,8 @@ test output, or private infrastructure details as first memories.
 ## What happens in a conversation
 
 - **At the start**, the conversation receives a short brief of what the repository already established.
-  Print mode has no prompt event, so the brief is delivered at the start there.
+  In the app, the first chat of a new window gets the brief with its first prompt instead. `cursor-agent -p`
+  has no prompt event, so the brief is delivered at the start there and prompts get no per-prompt memory.
 - **With each message**, memory that matches the prompt is added to what the agent sees. Injected memory is
   marked as data, not instructions.
 - **When a turn completes**, the IDE saves the prompt and reply of that turn. Only completed turns with a
@@ -114,6 +119,7 @@ Two settings in `settings.json` (in `~/.sno`, or in `SNO_PROFILE_DIR` when it is
 
 Onboarding is complete when:
 
+- `cursor-agent login` has been run;
 - `sno setup --harness cursor` finishes without an error and does not say it skipped Cursor;
 - `doctor` prints `healthy`, seven hooks `present`, and both permission rules `present` after a new
   conversation;
