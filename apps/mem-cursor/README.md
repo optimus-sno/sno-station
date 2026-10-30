@@ -22,6 +22,8 @@ next one, whichever agent opens it.
 A conversation outside a git repository reads and writes nothing. A conversation with several
 folders open belongs to the repository of the first folder.
 
+Walkthrough: [Cursor onboarding](https://github.com/sno-ai/sno-station/blob/main/docs/mem-cursor/onboarding.md).
+
 ## Under the hood
 
 This package is the Cursor side only: Cursor hooks and the memory commands. The memory itself
