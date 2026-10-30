@@ -27,7 +27,7 @@ In your Cursor folder (`~/.cursor`), `sno setup --harness cursor` writes these f
 
 | Where | What it adds |
 | --- | --- |
-| `hooks.json` | One entry for each of seven Cursor events: `sessionStart`, `beforeSubmitPrompt`, `afterAgentResponse`, `afterAgentThought`, `stop`, `preCompact`, `sessionEnd` |
+| `hooks.json` | One entry for each of seven Cursor events: `sessionStart`, `beforeSubmitPrompt`, `afterAgentResponse`, `afterAgentThought`, `stop`, `preCompact`, `sessionEnd`. Sno Reach keeps two entries of its own in the same file, `sno reach cursor-hook` on `beforeSubmitPrompt` and on `stop`; leave them in place, `doctor` does not check them |
 | `cli-config.json` | The permission rules `Shell(sno)` and `Shell(<path to sno>)`, so the Cursor CLI does not ask before every `sno` command |
 | `permissions.json` | The entries `sno` and the path to `sno` in the IDE's terminal allowlist |
 | `skills/sno-mem-cursor/SKILL.md` | The skill that teaches the Cursor agent four commands: recall, get, remember, correct |
@@ -42,7 +42,7 @@ as incomplete; fix the file and run it again.
 - Automatic recall and capture work only inside a git repository. They read and write that repository's
   memory, and recall also searches global memory.
 - Outside a git repository, and under the system temporary directory, the hooks read and write nothing.
-  The explicit `sno memory` commands still work there, with the folder you run them in as the scope.
+  The explicit `sno memory` commands still work there, with the git root as the scope if there is one, otherwise the folder you run them in.
 - With several folders open, the hooks use the repository of the first folder. To reach another
   repository's memory, run the memory commands from inside that repository's folder.
 
@@ -100,7 +100,7 @@ error output.
 
 ## Turning parts off
 
-Two settings in `<profile root>/settings.json` control the automatic parts. Explicit
+Two settings in `settings.json` (in `~/.sno`, or in `SNO_PROFILE_DIR` when it is set) control the automatic parts. Explicit
 `sno memory remember` and `sno memory recall` keep working either way.
 
 | Setting | Effect when `false` |
