@@ -7,7 +7,8 @@ the Cursor CLI the same memory that Claude Code and Codex use through Sno.
 
 Requirements:
 
-- Cursor IDE or Cursor CLI
+- Cursor, detected by `sno setup`: the `cursor-agent` command on your PATH, or the Cursor app on macOS. If you
+  use only the IDE on Linux, install the Cursor CLI too, or setup skips Cursor
 - Node.js 22.22.3 or newer on the 22 line, 24.15.0 or newer on the 24 line, or 25.9.0 or newer
 - `git` on your PATH (memory is scoped to the repository you work in)
 
@@ -91,8 +92,9 @@ test output, or private infrastructure details as first memories.
 - **When a turn completes**, the IDE saves the prompt and reply of that turn. Only completed turns with a
   non-empty prompt and reply are saved. The Cursor CLI is different: it reads the conversation transcript
   at each stop and again when the conversation ends.
-- **After that**, a background worker stores what was captured. If the end-of-conversation step fails, the
-  turns are stored once the conversation has been quiet for 30 minutes.
+- **After that**, a background worker stores a conversation's turns when the conversation ends, or once it
+  has been quiet for 30 minutes, whichever comes first. A chat you leave open is not recalled in another
+  chat right away.
 
 A hook never blocks Cursor. If one fails or receives input it cannot read, it answers Cursor with an empty
 reply and the conversation continues without memory for that step; the cause is written to the hook's
@@ -112,7 +114,7 @@ Two settings in `settings.json` (in `~/.sno`, or in `SNO_PROFILE_DIR` when it is
 
 Onboarding is complete when:
 
-- `sno setup --harness cursor` finishes without an error;
+- `sno setup --harness cursor` finishes without an error and does not say it skipped Cursor;
 - `doctor` prints `healthy`, seven hooks `present`, and both permission rules `present` after a new
   conversation;
 - the user can create a first memory and find it again with `recall`;
