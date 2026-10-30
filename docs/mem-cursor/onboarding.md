@@ -17,8 +17,9 @@ Complete the [memory service setup](../memory-setup.md), then install the Cursor
 sno setup --harness cursor
 ```
 
-The memory service setup writes `<profile root>/settings.json`. The profile root is `SNO_PROFILE_DIR`
-or `~/.sno`. Keep a private backup of that file, because it holds the only key for the encrypted store.
+The memory service setup writes `~/.sno/settings.json`. Keep a private backup of that file, because it
+holds the only key for the encrypted store. The Cursor hooks read `settings.json` from the folder named by
+`SNO_PROFILE_DIR` when that variable is set, so if you use it, put the file there.
 
 ## What the install changes
 
@@ -28,7 +29,7 @@ In your Cursor folder (`~/.cursor`), `sno setup --harness cursor` writes these f
 | --- | --- |
 | `hooks.json` | One entry for each of seven Cursor events: `sessionStart`, `beforeSubmitPrompt`, `afterAgentResponse`, `afterAgentThought`, `stop`, `preCompact`, `sessionEnd` |
 | `cli-config.json` | The permission rules `Shell(sno)` and `Shell(<path to sno>)`, so the Cursor CLI does not ask before every `sno` command |
-| `permissions.json` | The same two entries in the IDE's terminal allowlist |
+| `permissions.json` | The entries `sno` and the path to `sno` in the IDE's terminal allowlist |
 | `skills/sno-mem-cursor/SKILL.md` | The skill that teaches the Cursor agent four commands: recall, get, remember, correct |
 
 Entries that other tools wrote into the same files stay where they are. The installer replaces only its
@@ -38,13 +39,12 @@ as incomplete; fix the file and run it again.
 
 ## Which conversations have memory
 
-- A conversation inside a git repository reads and writes that repository's memory. Recall also searches
-  global memory.
-- A conversation outside a git repository reads and writes nothing.
-- With several folders open, the conversation belongs to the repository of the first folder. To reach
-  another repository's memory, run the memory commands from inside that repository's folder.
-- A conversation that starts under the system temporary directory is treated as a throwaway run and
-  never becomes memory.
+- Automatic recall and capture work only inside a git repository. They read and write that repository's
+  memory, and recall also searches global memory.
+- Outside a git repository, and under the system temporary directory, the hooks read and write nothing.
+  The explicit `sno memory` commands still work there, with the folder you run them in as the scope.
+- With several folders open, the hooks use the repository of the first folder. To reach another
+  repository's memory, run the memory commands from inside that repository's folder.
 
 ## Step 1: verify
 
@@ -66,7 +66,7 @@ IDE permission rule: present
 The memory service starts on demand: the first hook that needs it starts it. If `sidecar` shows
 `unavailable` before you have opened any conversation, open one in a git repository and run the command
 again. `absent` next to a hook means the install did not write that entry; run `sno setup --harness
-cursor` again. `unparsable` means that Cursor file is not valid JSON.
+cursor` again. `unparsable` means that Cursor file could not be read as the JSON the installer expects.
 
 ## Step 2: create the first useful memory
 
@@ -106,7 +106,7 @@ Two settings in `<profile root>/settings.json` control the automatic parts. Expl
 | Setting | Effect when `false` |
 | --- | --- |
 | `recall.auto` | No brief at the start and no memory added to prompts |
-| `capture.ambient` | Turns are not captured; each skipped turn is recorded as `capture-off` |
+| `capture.ambient` | Turns are not captured (the IDE records each skipped turn as `capture-off`) |
 
 ## Onboarding acceptance checklist
 
